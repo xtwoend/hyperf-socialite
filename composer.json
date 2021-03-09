@@ -1,0 +1,53 @@
+{
+    "name": "xtwoend/hyperf-socialite",
+    "description": "Hyperf wrapper around OAuth 1 & OAuth 2 libraries.",
+    "keywords": ["oauth", "hyperf"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylor@laravel.com"
+        },
+        {
+            "name": "Abdul Hafidz",
+            "email": "aditans88@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2|^8.0",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^6.0|^7.0",
+        "hyperf/guzzle": "^2.1",
+        "hyperf/utils": "^2.1",
+        "hyperf/session": "^2.1",
+        "league/oauth1-client": "^1.0"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.0",
+        "orchestra/testbench": "^4.0|^5.0|^6.0",
+        "phpunit/phpunit": "^8.0|^9.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Xtwoend\\HySocialite\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Xtwoend\\HySocialite\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        },
+        "hyperf": {
+            "config": "Xtwoend\\HySocialite\\ConfigProvider"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
