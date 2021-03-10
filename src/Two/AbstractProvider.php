@@ -173,6 +173,7 @@ abstract class AbstractProvider implements ProviderContract
 
         if ($this->usesState()) {
             $this->session->put('state', $state = $this->getState());
+            $this->session->put($state, $this->parameters);
         }
 
         if ($this->usesPKCE()) {
@@ -208,7 +209,7 @@ abstract class AbstractProvider implements ProviderContract
             'client_id' => $this->clientId,
             'redirect_uri' => $this->redirectUrl,
             'scope' => $this->formatScopes($this->getScopes(), $this->scopeSeparator),
-            'response_type' => 'code',
+            'response_type' => 'code'
         ];
 
         if ($this->usesState()) {
