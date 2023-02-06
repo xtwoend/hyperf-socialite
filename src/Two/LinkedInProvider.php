@@ -1,6 +1,6 @@
 <?php
 
-namespace Xtwoend\HySocialite\Two;
+namespace OnixSystemsPHP\HyperfSocialite\Two;
 
 use Hyperf\Utils\Arr;
 
@@ -11,19 +11,19 @@ class LinkedInProvider extends AbstractProvider implements ProviderInterface
      *
      * @var array
      */
-    protected $scopes = ['r_liteprofile', 'r_emailaddress'];
+    protected array $scopes = ['r_liteprofile', 'r_emailaddress'];
 
     /**
      * The separating character for the requested scopes.
      *
      * @var string
      */
-    protected $scopeSeparator = ' ';
+    protected string $scopeSeparator = ' ';
 
     /**
      * {@inheritdoc}
      */
-    protected function getAuthUrl($state)
+    protected function getAuthUrl(?string $state): string
     {
         return $this->buildAuthUrlFromBase('https://www.linkedin.com/oauth/v2/authorization', $state);
     }
@@ -31,7 +31,7 @@ class LinkedInProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function getTokenUrl()
+    protected function getTokenUrl(): string
     {
         return 'https://www.linkedin.com/oauth/v2/accessToken';
     }
@@ -39,7 +39,7 @@ class LinkedInProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function getUserByToken($token)
+    protected function getUserByToken(string $token): array
     {
         $basicProfile = $this->getBasicProfile($token);
         $emailAddress = $this->getEmailAddress($token);
@@ -53,7 +53,7 @@ class LinkedInProvider extends AbstractProvider implements ProviderInterface
      * @param  string  $token
      * @return array
      */
-    protected function getBasicProfile($token)
+    protected function getBasicProfile(string $token): array
     {
         $url = 'https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))';
 
@@ -73,7 +73,7 @@ class LinkedInProvider extends AbstractProvider implements ProviderInterface
      * @param  string  $token
      * @return array
      */
-    protected function getEmailAddress($token)
+    protected function getEmailAddress(string $token): array
     {
         $url = 'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))';
 
@@ -90,7 +90,7 @@ class LinkedInProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function mapUserToObject(array $user)
+    protected function mapUserToObject(array $user): User
     {
         $preferredLocale = Arr::get($user, 'firstName.preferredLocale.language').'_'.Arr::get($user, 'firstName.preferredLocale.country');
         $firstName = Arr::get($user, 'firstName.localized.'.$preferredLocale);
@@ -105,7 +105,7 @@ class LinkedInProvider extends AbstractProvider implements ProviderInterface
         });
 
         return (new User)->setRaw($user)->map([
-            'id' => $user['id'],
+            'id' => (string) $user['id'],
             'nickname' => null,
             'name' => $firstName.' '.$lastName,
             'first_name' => $firstName,

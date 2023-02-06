@@ -1,19 +1,19 @@
 <?php
 
-namespace Xtwoend\HySocialite;
+namespace OnixSystemsPHP\HyperfSocialite;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Utils\Arr;
 use Hyperf\Utils\Str;
 use InvalidArgumentException;
-use Xtwoend\HySocialite\Two\GithubProvider;
-use Xtwoend\HySocialite\Two\GitlabProvider;
-use Xtwoend\HySocialite\Two\GoogleProvider;
-use Xtwoend\HySocialite\One\TwitterProvider;
-use Xtwoend\HySocialite\Two\FacebookProvider;
-use Xtwoend\HySocialite\Two\LinkedInProvider;
-use Xtwoend\HySocialite\Two\BitbucketProvider;
-use Hyperf\HttpServer\Contract\RequestInterface;
 use League\OAuth1\Client\Server\Twitter as TwitterServer;
+use OnixSystemsPHP\HyperfSocialite\One\TwitterProvider;
+use OnixSystemsPHP\HyperfSocialite\Two\BitbucketProvider;
+use OnixSystemsPHP\HyperfSocialite\Two\FacebookProvider;
+use OnixSystemsPHP\HyperfSocialite\Two\GithubProvider;
+use OnixSystemsPHP\HyperfSocialite\Two\GitlabProvider;
+use OnixSystemsPHP\HyperfSocialite\Two\GoogleProvider;
+use OnixSystemsPHP\HyperfSocialite\Two\LinkedInProvider;
 
 class SocialiteManager extends Manager implements Contracts\Factory
 {
@@ -23,7 +23,7 @@ class SocialiteManager extends Manager implements Contracts\Factory
      * @param  string  $driver
      * @return mixed
      */
-    public function with($driver)
+    public function with(string $driver): mixed
     {
         return $this->driver($driver);
     }
@@ -31,9 +31,9 @@ class SocialiteManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Xtwoend\HySocialite\Two\AbstractProvider
+     * @return \OnixSystemsPHP\HyperfSocialite\Two\AbstractProvider
      */
-    protected function createGithubDriver()
+    protected function createGithubDriver(): Two\AbstractProvider
     {
         $config = $this->config->get('socialite.github');
 
@@ -45,9 +45,9 @@ class SocialiteManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Xtwoend\HySocialite\Two\AbstractProvider
+     * @return \OnixSystemsPHP\HyperfSocialite\Two\AbstractProvider
      */
-    protected function createFacebookDriver()
+    protected function createFacebookDriver(): Two\AbstractProvider
     {
         $config = $this->config->get('socialite.facebook');
 
@@ -59,9 +59,9 @@ class SocialiteManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Xtwoend\HySocialite\Two\AbstractProvider
+     * @return \OnixSystemsPHP\HyperfSocialite\Two\AbstractProvider
      */
-    protected function createGoogleDriver()
+    protected function createGoogleDriver(): Two\AbstractProvider
     {
         $config = $this->config->get('socialite.google');
 
@@ -73,9 +73,9 @@ class SocialiteManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Xtwoend\HySocialite\Two\AbstractProvider
+     * @return \OnixSystemsPHP\HyperfSocialite\Two\AbstractProvider
      */
-    protected function createLinkedinDriver()
+    protected function createLinkedinDriver(): Two\AbstractProvider
     {
         $config = $this->config->get('socialite.linkedin');
 
@@ -87,9 +87,9 @@ class SocialiteManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Xtwoend\HySocialite\Two\AbstractProvider
+     * @return \OnixSystemsPHP\HyperfSocialite\Two\AbstractProvider
      */
-    protected function createBitbucketDriver()
+    protected function createBitbucketDriver(): Two\AbstractProvider
     {
         $config = $this->config->get('socialite.bitbucket');
 
@@ -101,9 +101,9 @@ class SocialiteManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Xtwoend\HySocialite\Two\AbstractProvider
+     * @return \OnixSystemsPHP\HyperfSocialite\Two\AbstractProvider
      */
-    protected function createGitlabDriver()
+    protected function createGitlabDriver(): Two\AbstractProvider
     {
         $config = $this->config->get('socialite.gitlab');
 
@@ -115,11 +115,11 @@ class SocialiteManager extends Manager implements Contracts\Factory
     /**
      * Build an OAuth 2 provider instance.
      *
-     * @param  string  $provider
-     * @param  array  $config
-     * @return \Xtwoend\HySocialite\Two\AbstractProvider
+     * @param string $provider
+     * @param array  $config
+     * @return \OnixSystemsPHP\HyperfSocialite\Two\AbstractProvider
      */
-    public function buildProvider($provider, $config)
+    public function buildProvider(string $provider, array $config): Two\AbstractProvider
     {
         return new $provider(
             $this->container->make(RequestInterface::class), $config['client_id'],
@@ -131,11 +131,11 @@ class SocialiteManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Xtwoend\HySocialite\One\AbstractProvider
+     * @return \OnixSystemsPHP\HyperfSocialite\One\AbstractProvider
      */
-    protected function createTwitterDriver()
+    protected function createTwitterDriver(): One\AbstractProvider
     {
-        $config = config('socialite.twitter');
+        $config = $this->config->get('socialite.twitter');
 
         return new TwitterProvider(
             $this->container->make('request'), new TwitterServer($this->formatConfig($config))
@@ -148,7 +148,7 @@ class SocialiteManager extends Manager implements Contracts\Factory
      * @param  array  $config
      * @return array
      */
-    public function formatConfig(array $config)
+    public function formatConfig(array $config): array
     {
         return array_merge([
             'identifier' => $config['client_id'],
@@ -163,7 +163,7 @@ class SocialiteManager extends Manager implements Contracts\Factory
      * @param  array  $config
      * @return string
      */
-    protected function formatRedirectUrl(array $config)
+    protected function formatRedirectUrl(array $config): string
     {
         $redirect = $config['redirect'];
 
@@ -179,7 +179,7 @@ class SocialiteManager extends Manager implements Contracts\Factory
      *
      * @throws \InvalidArgumentException
      */
-    public function getDefaultDriver()
+    public function getDefaultDriver(): string
     {
         throw new InvalidArgumentException('No Socialite driver was specified.');
     }

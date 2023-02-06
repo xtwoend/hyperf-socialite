@@ -1,44 +1,35 @@
 <?php
 
-namespace Xtwoend\HySocialite\One;
+namespace OnixSystemsPHP\HyperfSocialite\One;
 
 
 use Hyperf\Contract\SessionInterface;
-use League\OAuth1\Client\Server\Server;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
+use Hyperf\Utils\ApplicationContext;
 use League\OAuth1\Client\Credentials\TokenCredentials;
-use Xtwoend\HySocialite\Contracts\Provider as ProviderContract;
+use League\OAuth1\Client\Server\Server;
+use OnixSystemsPHP\HyperfSocialite\Contracts\Provider as ProviderContract;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 abstract class AbstractProvider implements ProviderContract
 {
-    /**
-     *
-     *
-     * @var \Hyperf\Contract\SessionInterface
-     */
-    protected $session;
+    protected SessionInterface $session;
 
     /**
      * The HTTP request instance.
-     *
-     * @var \Hyperf\HttpServer\Contract\RequestInterface
      */
-    protected $request;
+    protected RequestInterface $request;
 
     /**
      * The OAuth server implementation.
-     *
-     * @var \League\OAuth1\Client\Server\Server
      */
-    protected $server;
+    protected Server $server;
 
     /**
      * A hash representing the last requested user.
-     *
-     * @var string
      */
-    protected $userHash;
+    protected string $userHash;
 
     /**
      * Create a new provider instance.
@@ -51,15 +42,15 @@ abstract class AbstractProvider implements ProviderContract
     {
         $this->server = $server;
         $this->request = $request;
-        $this->session = make(SessionInterface::class);
+        $this->session = ApplicationContext::getContainer()->get(SessionInterface::class);
     }
 
     /**
      * Redirect the user to the authentication page for the provider.
      *
-     * @return Response
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function redirect()
+    public function redirect(): PsrResponseInterface
     {
         $this->session->put(
             'oauth.temp', $temp = $this->server->getTemporaryCredentials()
@@ -72,11 +63,11 @@ abstract class AbstractProvider implements ProviderContract
     /**
      * Get the User instance for the authenticated user.
      *
-     * @return \Xtwoend\HySocialite\One\User
+     * @return \OnixSystemsPHP\HyperfSocialite\One\User
      *
-     * @throws \Xtwoend\HySocialite\One\MissingVerifierException
+     * @throws \OnixSystemsPHP\HyperfSocialite\One\MissingVerifierException
      */
-    public function user()
+    public function user(): User
     {
         if (! $this->hasNecessaryVerifier()) {
             throw new MissingVerifierException('Invalid request. Missing OAuth verifier.');
@@ -105,9 +96,9 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @param  string  $token
      * @param  string  $secret
-     * @return \Xtwoend\HySocialite\One\User
+     * @return \OnixSystemsPHP\HyperfSocialite\One\User
      */
-    public function userFromTokenAndSecret($token, $secret)
+    public function userFromTokenAndSecret($token, $secret): User
     {
         $tokenCredentials = new TokenCredentials();
 
@@ -135,7 +126,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return \League\OAuth1\Client\Credentials\TokenCredentials
      */
-    protected function getToken()
+    protected function getToken(): TokenCredentials
     {
         $temp = $this->session->get('oauth.temp');
 
@@ -153,7 +144,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return bool
      */
-    protected function hasNecessaryVerifier()
+    protected function hasNecessaryVerifier(): bool
     {
         return $this->request->has('oauth_token') && $this->request->has('oauth_verifier');
     }
@@ -165,7 +156,7 @@ abstract class AbstractProvider implements ProviderContract
      * @param  string  $secret
      * @return bool
      */
-    protected function shouldBypassCache($token, $secret)
+    protected function shouldBypassCache(string $token, string $secret): bool
     {
         $newHash = sha1($token.'_'.$secret);
 
@@ -186,7 +177,7 @@ abstract class AbstractProvider implements ProviderContract
      * @param  \Hyperf\HttpServer\Contract\RequestInterface $request
      * @return $this
      */
-    public function setRequest(RequestInterface $request)
+    public function setRequest(RequestInterface $request): self
     {
         $this->request = $request;
 

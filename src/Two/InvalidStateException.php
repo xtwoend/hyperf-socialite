@@ -1,6 +1,6 @@
 <?php
 
-namespace Xtwoend\HySocialite\Two;
+namespace OnixSystemsPHP\HyperfSocialite\Two;
 
 use InvalidArgumentException;
 

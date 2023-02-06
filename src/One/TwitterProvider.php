@@ -1,13 +1,13 @@
 <?php
 
-namespace Xtwoend\HySocialite\One;
+namespace OnixSystemsPHP\HyperfSocialite\One;
 
 class TwitterProvider extends AbstractProvider
 {
     /**
      * {@inheritdoc}
      */
-    public function user()
+    public function user(): User
     {
         if (! $this->hasNecessaryVerifier()) {
             throw new MissingVerifierException('Invalid request. Missing OAuth verifier.');

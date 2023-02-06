@@ -1,12 +1,12 @@
 <?php
 
-namespace Laravel\Socialite\Tests;
+namespace OnixSystemsPHP\HyperfSocialite\Tests;
 
 use GuzzleHttp\Client;
-use Illuminate\Http\Request;
-use Laravel\Socialite\Two\LinkedInProvider;
-use Laravel\Socialite\Two\User;
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Mockery as m;
+use OnixSystemsPHP\HyperfSocialite\Two\LinkedInProvider;
+use OnixSystemsPHP\HyperfSocialite\Two\User;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 
@@ -21,7 +21,7 @@ class LinkedInProviderTest extends TestCase
 
     public function test_it_can_map_a_user_without_an_email_address()
     {
-        $request = m::mock(Request::class);
+        $request = m::mock(RequestInterface::class);
         $request->shouldReceive('input')->with('code')->andReturn('fake-code');
 
         $accessTokenResponse = m::mock(ResponseInterface::class);

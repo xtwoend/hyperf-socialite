@@ -1,8 +1,8 @@
 <?php
 
-namespace Laravel\Socialite\Tests\Fixtures;
+namespace OnixSystemsPHP\HyperfSocialite\Tests\Fixtures;
 
 class OAuthTwoWithPKCETestProviderStub extends OAuthTwoTestProviderStub
 {
-    protected $usesPKCE = true;
+    protected bool $usesPKCE = true;
 }

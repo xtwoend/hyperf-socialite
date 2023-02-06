@@ -1,21 +1,15 @@
 <?php
 
-namespace Laravel\Socialite\Tests;
+namespace OnixSystemsPHP\HyperfSocialite\Tests;
 
-use Illuminate\Contracts\Session\Session;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Laravel\Socialite\Tests\Fixtures\FacebookTestProviderStub;
-use Laravel\Socialite\Tests\Fixtures\OAuthTwoTestProviderStub;
-use Laravel\Socialite\Tests\Fixtures\OAuthTwoWithPKCETestProviderStub;
-use Laravel\Socialite\Two\InvalidStateException;
-use Laravel\Socialite\Two\User;
+use OnixSystemsPHP\HyperfSocialite\Tests\Fixtures\FacebookTestProviderStub;
+use OnixSystemsPHP\HyperfSocialite\Tests\Fixtures\OAuthTwoTestProviderStub;
+use OnixSystemsPHP\HyperfSocialite\Tests\Fixtures\OAuthTwoWithPKCETestProviderStub;
+use OnixSystemsPHP\HyperfSocialite\Two\InvalidStateException;
+use OnixSystemsPHP\HyperfSocialite\Two\User;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class OAuthTwoTest extends TestCase
 {

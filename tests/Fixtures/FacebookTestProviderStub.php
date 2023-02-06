@@ -1,8 +1,8 @@
 <?php
 
-namespace Laravel\Socialite\Tests\Fixtures;
+namespace OnixSystemsPHP\HyperfSocialite\Tests\Fixtures;
 
-use Laravel\Socialite\Two\FacebookProvider;
+use OnixSystemsPHP\HyperfSocialite\Two\FacebookProvider;
 use Mockery as m;
 use stdClass;
 
@@ -13,7 +13,7 @@ class FacebookTestProviderStub extends FacebookProvider
      */
     public $http;
 
-    protected function getUserByToken($token)
+    protected function getUserByToken(string $token): array
     {
         return ['id' => 'foo'];
     }
@@ -23,7 +23,7 @@ class FacebookTestProviderStub extends FacebookProvider
      *
      * @return \GuzzleHttp\Client|\Mockery\MockInterface
      */
-    protected function getHttpClient()
+    protected function getHttpClient(): \GuzzleHttp\Client
     {
         if ($this->http) {
             return $this->http;
