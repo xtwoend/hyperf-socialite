@@ -339,7 +339,12 @@ abstract class AbstractProvider implements ProviderContract
      */
     protected function getCode(): string
     {
-        return $this->request->input('code');
+        $code = $this->request->input('code');
+        if (empty($code)) {
+            throw new InvalidCodeException();
+        }
+
+        return $code;
     }
 
     /**
