@@ -1,9 +1,7 @@
 <?php
 
-namespace Xtwoend\HySocialite;
+namespace OnixSystemsPHP\HyperfSocialite;
 
-use Xtwoend\HySocialite\SocialiteManager;
-use Xtwoend\HySocialite\Contracts\Factory;
 
 class ConfigProvider
 {
@@ -11,7 +9,7 @@ class ConfigProvider
     {
         return [
             'dependencies' => [
-                Factory::class => SocialiteManager::class
+                \OnixSystemsPHP\HyperfSocialite\Contracts\Factory::class => \OnixSystemsPHP\HyperfSocialite\SocialiteManager::class,
             ],
             'annotations' => [
                 'scan' => [

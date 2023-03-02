@@ -1,10 +1,10 @@
 <?php
 
-namespace Laravel\Socialite\Tests;
+namespace OnixSystemsPHP\HyperfSocialite\Tests;
 
-use Laravel\Socialite\Contracts\Factory;
-use Laravel\Socialite\SocialiteServiceProvider;
-use Laravel\Socialite\Two\GithubProvider;
+use OnixSystemsPHP\HyperfSocialite\Contracts\Factory;
+use OnixSystemsPHP\HyperfSocialite\SocialiteServiceProvider;
+use OnixSystemsPHP\HyperfSocialite\Two\GithubProvider;
 use Orchestra\Testbench\TestCase;
 
 class SocialiteManagerTest extends TestCase

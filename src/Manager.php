@@ -1,12 +1,13 @@
 <?php
 
-namespace Xtwoend\HySocialite;
+namespace OnixSystemsPHP\HyperfSocialite;
 
 use Closure;
-use Hyperf\Utils\Str;
-use InvalidArgumentException;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\ContainerInterface;
+use Hyperf\Utils\Str;
+use InvalidArgumentException;
+use OnixSystemsPHP\HyperfSocialite\Contracts\Provider;
 
 abstract class Manager
 {
@@ -15,28 +16,28 @@ abstract class Manager
      *
      * @var \Hyperf\Contract\ContainerInterface
      */
-    protected $container;
+    protected ContainerInterface $container;
 
     /**
      * The configuration repository instance.
      *
      * @var \Hyperf\Contract\ConfigInterface
      */
-    protected $config;
+    protected ConfigInterface $config;
 
     /**
      * The registered custom driver creators.
      *
      * @var array
      */
-    protected $customCreators = [];
+    protected array $customCreators = [];
 
     /**
      * The array of created "drivers".
      *
      * @var array
      */
-    protected $drivers = [];
+    protected array $drivers = [];
 
     /**
      * Create a new manager instance.
@@ -55,17 +56,17 @@ abstract class Manager
      *
      * @return string
      */
-    abstract public function getDefaultDriver();
+    abstract public function getDefaultDriver(): string;
 
     /**
      * Get a driver instance.
      *
      * @param  string|null  $driver
-     * @return mixed
+     * @return \OnixSystemsPHP\HyperfSocialite\Contracts\Provider
      *
      * @throws \InvalidArgumentException
      */
-    public function driver($driver = null)
+    public function driver(string|null $driver = null): Provider
     {
         $driver = $driver ?: $this->getDefaultDriver();
 
@@ -94,7 +95,7 @@ abstract class Manager
      *
      * @throws \InvalidArgumentException
      */
-    protected function createDriver($driver)
+    protected function createDriver(string $driver): mixed
     {
         // First, we will determine if a custom driver creator exists for the given driver and
         // if it does not we will check for a creator method for the driver. Custom creator
@@ -118,7 +119,7 @@ abstract class Manager
      * @param  string  $driver
      * @return mixed
      */
-    protected function callCustomCreator($driver)
+    protected function callCustomCreator(string $driver): mixed
     {
         return $this->customCreators[$driver]($this->container);
     }
@@ -130,7 +131,7 @@ abstract class Manager
      * @param  \Closure  $callback
      * @return $this
      */
-    public function extend($driver, Closure $callback)
+    public function extend(string $driver, Closure $callback): self
     {
         $this->customCreators[$driver] = $callback;
 
@@ -142,7 +143,7 @@ abstract class Manager
      *
      * @return array
      */
-    public function getDrivers()
+    public function getDrivers(): array
     {
         return $this->drivers;
     }
@@ -154,7 +155,7 @@ abstract class Manager
      * @param  array  $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters): mixed
     {
         return $this->driver()->$method(...$parameters);
     }

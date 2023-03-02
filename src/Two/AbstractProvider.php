@@ -1,15 +1,16 @@
 <?php
 
-namespace Xtwoend\HySocialite\Two;
+namespace OnixSystemsPHP\HyperfSocialite\Two;
 
-use Hyperf\Utils\Arr;
-use Hyperf\Utils\Str;
 use GuzzleHttp\Client;
 use Hyperf\Contract\SessionInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
-use Xtwoend\HySocialite\Two\InvalidStateException;
-use Xtwoend\HySocialite\Contracts\Provider as ProviderContract;
+use Hyperf\Utils\ApplicationContext;
+use Hyperf\Utils\Arr;
+use Hyperf\Utils\Str;
+use OnixSystemsPHP\HyperfSocialite\Contracts\Provider as ProviderContract;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 abstract class AbstractProvider implements ProviderContract
 {
@@ -18,98 +19,98 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @var \Hyperf\Contract\SessionInterface
      */
-    protected $session;
+    protected SessionInterface $session;
 
     /**
      * The HTTP request instance.
      *
      * @var \Hyperf\HttpServer\Request
      */
-    protected $request;
+    protected RequestInterface $request;
 
     /**
      * The HTTP Client instance.
      *
-     * @var \GuzzleHttp\Client
+     * @var \GuzzleHttp\Client|null
      */
-    protected $httpClient;
+    protected ?Client $httpClient = null;
 
     /**
      * The client ID.
      *
      * @var string
      */
-    protected $clientId;
+    protected string $clientId;
 
     /**
      * The client secret.
      *
      * @var string
      */
-    protected $clientSecret;
+    protected string $clientSecret;
 
     /**
      * The redirect URL.
      *
      * @var string
      */
-    protected $redirectUrl;
+    protected string $redirectUrl;
 
     /**
      * The custom parameters to be sent with the request.
      *
      * @var array
      */
-    protected $parameters = [];
+    protected array $parameters = [];
 
     /**
      * The scopes being requested.
      *
      * @var array
      */
-    protected $scopes = [];
+    protected array $scopes = [];
 
     /**
      * The separating character for the requested scopes.
      *
      * @var string
      */
-    protected $scopeSeparator = ',';
+    protected string $scopeSeparator = ',';
 
     /**
      * The type of the encoding in the query.
      *
      * @var int Can be either PHP_QUERY_RFC3986 or PHP_QUERY_RFC1738.
      */
-    protected $encodingType = PHP_QUERY_RFC1738;
+    protected int $encodingType = PHP_QUERY_RFC1738;
 
     /**
      * Indicates if the session state should be utilized.
      *
      * @var bool
      */
-    protected $stateless = false;
+    protected bool $stateless = false;
 
     /**
      * Indicates if PKCE should be used.
      *
      * @var bool
      */
-    protected $usesPKCE = false;
+    protected bool $usesPKCE = false;
 
     /**
      * The custom Guzzle configuration options.
      *
      * @var array
      */
-    protected $guzzle = [];
+    protected array $guzzle = [];
 
     /**
      * The cached user instance.
      *
-     * @var \Xtwoend\HySocialite\Two\User|null
+     * @var \OnixSystemsPHP\HyperfSocialite\Two\User|null
      */
-    protected $user;
+    protected ?User $user = null;
 
     /**
      * Create a new provider instance.
@@ -121,53 +122,53 @@ abstract class AbstractProvider implements ProviderContract
      * @param  array  $guzzle
      * @return void
      */
-    public function __construct(RequestInterface $request, $clientId, $clientSecret, $redirectUrl, $guzzle = [])
+    public function __construct(RequestInterface $request, string $clientId, string $clientSecret, string $redirectUrl, array $guzzle = [])
     {
         $this->guzzle = $guzzle;
         $this->request = $request;
         $this->clientId = $clientId;
         $this->redirectUrl = $redirectUrl;
         $this->clientSecret = $clientSecret;
-        $this->session = make(SessionInterface::class);
+        $this->session = ApplicationContext::getContainer()->get(SessionInterface::class);
     }
 
     /**
      * Get the authentication URL for the provider.
      *
-     * @param  string  $state
+     * @param  string|null $state
      * @return string
      */
-    abstract protected function getAuthUrl($state);
+    abstract protected function getAuthUrl(?string $state): string;
 
     /**
      * Get the token URL for the provider.
      *
      * @return string
      */
-    abstract protected function getTokenUrl();
+    abstract protected function getTokenUrl(): string;
 
     /**
      * Get the raw user for the given access token.
      *
-     * @param  string  $token
+     * @param  string $token
      * @return array
      */
-    abstract protected function getUserByToken($token);
+    abstract protected function getUserByToken(string $token): array;
 
     /**
      * Map the raw user array to a Socialite User instance.
      *
      * @param  array  $user
-     * @return \Xtwoend\HySocialite\Two\User
+     * @return \OnixSystemsPHP\HyperfSocialite\Two\User
      */
-    abstract protected function mapUserToObject(array $user);
+    abstract protected function mapUserToObject(array $user): User;
 
     /**
      * Redirect the user of the application to the provider's authentication screen.
      *
-     * @return RedirectResponse
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function redirect()
+    public function redirect(): PsrResponseInterface
     {
         $state = null;
 
@@ -180,6 +181,7 @@ abstract class AbstractProvider implements ProviderContract
             $this->session->put('code_verifier', $codeVerifier = $this->getCodeVerifier());
         }
 
+        /** @var ResponseInterface $response */
         $response = make(ResponseInterface::class);
 
         return $response->redirect($this->getAuthUrl($state));
@@ -188,11 +190,11 @@ abstract class AbstractProvider implements ProviderContract
     /**
      * Build the authentication URL for the provider from the given base URL.
      *
-     * @param  string  $url
-     * @param  string  $state
+     * @param  string $url
+     * @param  string|null $state
      * @return string
      */
-    protected function buildAuthUrlFromBase($url, $state)
+    protected function buildAuthUrlFromBase(string $url, ?string $state): string
     {
         return $url.'?'.http_build_query($this->getCodeFields($state), '', '&', $this->encodingType);
     }
@@ -200,10 +202,10 @@ abstract class AbstractProvider implements ProviderContract
     /**
      * Get the GET parameters for the code request.
      *
-     * @param  string|null  $state
+     * @param  string|null $state
      * @return array
      */
-    protected function getCodeFields($state = null)
+    protected function getCodeFields(?string $state = null): array
     {
         $fields = [
             'client_id' => $this->clientId,
@@ -227,11 +229,11 @@ abstract class AbstractProvider implements ProviderContract
     /**
      * Format the given scopes.
      *
-     * @param  array  $scopes
-     * @param  string  $scopeSeparator
+     * @param  array $scopes
+     * @param  string $scopeSeparator
      * @return string
      */
-    protected function formatScopes(array $scopes, $scopeSeparator)
+    protected function formatScopes(array $scopes, string $scopeSeparator): string
     {
         return implode($scopeSeparator, $scopes);
     }
@@ -239,7 +241,7 @@ abstract class AbstractProvider implements ProviderContract
     /**
      * {@inheritdoc}
      */
-    public function user()
+    public function user(): User
     {
         if ($this->user) {
             return $this->user;
@@ -264,9 +266,9 @@ abstract class AbstractProvider implements ProviderContract
      * Get a Social User instance from a known access token.
      *
      * @param  string  $token
-     * @return \Xtwoend\HySocialite\Two\User
+     * @return \OnixSystemsPHP\HyperfSocialite\Two\User
      */
-    public function userFromToken($token)
+    public function userFromToken(string $token): User
     {
         $user = $this->mapUserToObject($this->getUserByToken($token));
 
@@ -278,7 +280,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return bool
      */
-    protected function hasInvalidState()
+    protected function hasInvalidState(): bool
     {
         if ($this->isStateless()) {
             return false;
@@ -293,10 +295,10 @@ abstract class AbstractProvider implements ProviderContract
     /**
      * Get the access token response for the given code.
      *
-     * @param  string  $code
+     * @param  string $code
      * @return array
      */
-    public function getAccessTokenResponse($code)
+    public function getAccessTokenResponse(string $code): array
     {
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'headers' => ['Accept' => 'application/json'],
@@ -309,10 +311,10 @@ abstract class AbstractProvider implements ProviderContract
     /**
      * Get the POST fields for the token request.
      *
-     * @param  string  $code
+     * @param  string $code
      * @return array
      */
-    protected function getTokenFields($code)
+    protected function getTokenFields(string $code): array
     {
         $fields = [
             'grant_type' => 'authorization_code',
@@ -335,9 +337,14 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return string
      */
-    protected function getCode()
+    protected function getCode(): string
     {
-        return $this->request->input('code');
+        $code = $this->request->input('code');
+        if (empty($code)) {
+            throw new InvalidCodeException();
+        }
+
+        return $code;
     }
 
     /**
@@ -346,7 +353,7 @@ abstract class AbstractProvider implements ProviderContract
      * @param  array|string  $scopes
      * @return $this
      */
-    public function scopes($scopes)
+    public function scopes(array|string $scopes): self
     {
         $this->scopes = array_unique(array_merge($this->scopes, (array) $scopes));
 
@@ -359,7 +366,7 @@ abstract class AbstractProvider implements ProviderContract
      * @param  array|string  $scopes
      * @return $this
      */
-    public function setScopes($scopes)
+    public function setScopes(array|string $scopes): self
     {
         $this->scopes = array_unique((array) $scopes);
 
@@ -371,7 +378,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return array
      */
-    public function getScopes()
+    public function getScopes(): array
     {
         return $this->scopes;
     }
@@ -382,7 +389,7 @@ abstract class AbstractProvider implements ProviderContract
      * @param  string  $url
      * @return $this
      */
-    public function redirectUrl($url)
+    public function redirectUrl(string $url): self
     {
         $this->redirectUrl = $url;
 
@@ -394,7 +401,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return \GuzzleHttp\Client
      */
-    protected function getHttpClient()
+    protected function getHttpClient(): Client
     {
         if (is_null($this->httpClient)) {
             $this->httpClient = new Client($this->guzzle);
@@ -409,7 +416,7 @@ abstract class AbstractProvider implements ProviderContract
      * @param  \GuzzleHttp\Client  $client
      * @return $this
      */
-    public function setHttpClient(Client $client)
+    public function setHttpClient(Client $client): self
     {
         $this->httpClient = $client;
 
@@ -422,7 +429,7 @@ abstract class AbstractProvider implements ProviderContract
      * @param  \Hyperf\HttpServer\Contract\RequestInterface $request
      * @return $this
      */
-    public function setRequest(RequestInterface $request)
+    public function setRequest(RequestInterface $request): self
     {
         $this->request = $request;
 
@@ -434,7 +441,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return bool
      */
-    protected function usesState()
+    protected function usesState(): bool
     {
         return ! $this->stateless;
     }
@@ -444,7 +451,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return bool
      */
-    protected function isStateless()
+    protected function isStateless(): bool
     {
         return $this->stateless;
     }
@@ -454,7 +461,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return $this
      */
-    public function stateless()
+    public function stateless(): self
     {
         $this->stateless = true;
 
@@ -466,7 +473,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return string
      */
-    protected function getState()
+    protected function getState(): string
     {
         return Str::random(40);
     }
@@ -476,7 +483,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return bool
      */
-    protected function usesPKCE()
+    protected function usesPKCE(): bool
     {
         return $this->usesPKCE;
     }
@@ -486,7 +493,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return $this
      */
-    protected function enablePKCE()
+    protected function enablePKCE(): self
     {
         $this->usesPKCE = true;
 
@@ -498,7 +505,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return string
      */
-    protected function getCodeVerifier()
+    protected function getCodeVerifier(): string
     {
         return Str::random(96);
     }
@@ -508,7 +515,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return string
      */
-    protected function getCodeChallenge()
+    protected function getCodeChallenge(): string
     {
         $hashed = hash('sha256', $this->session->get('code_verifier'), true);
 
@@ -520,7 +527,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return string
      */
-    protected function getCodeChallengeMethod()
+    protected function getCodeChallengeMethod(): string
     {
         return 'S256';
     }
@@ -528,10 +535,10 @@ abstract class AbstractProvider implements ProviderContract
     /**
      * Set the custom parameters of the request.
      *
-     * @param  array  $parameters
+     * @param  array $parameters
      * @return $this
      */
-    public function with(array $parameters)
+    public function with(array $parameters): self
     {
         $this->parameters = $parameters;
 

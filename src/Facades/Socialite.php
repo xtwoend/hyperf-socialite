@@ -1,16 +1,18 @@
 <?php
 
-namespace Xtwoend\HySocialite\Facades;
+namespace OnixSystemsPHP\HyperfSocialite\Facades;
 
-use Xtwoend\HySocialite\Contracts\Factory;
+use OnixSystemsPHP\HyperfSocialite\Contracts\Factory;
 
 /**
- * @method static \Xtwoend\HySocialite\Contracts\Provider driver(string $driver = null)
- * @see \Xtwoend\HySocialite\SocialiteManager
+ * @method static \OnixSystemsPHP\HyperfSocialite\Contracts\Provider driver(string $driver = null)
+ * @method static \OnixSystemsPHP\HyperfSocialite\Contracts\Provider with(string $driver = null)
+ * @method static \OnixSystemsPHP\HyperfSocialite\Contracts\Provider buildProvider(string $provider, array $config)
+ * @see \OnixSystemsPHP\HyperfSocialite\SocialiteManager
  */
 class Socialite
 {
-    protected $manager;
+    protected Factory $manager;
 
     public function __construct()
     {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Laravel\Socialite\Tests\Fixtures;
+namespace OnixSystemsPHP\HyperfSocialite\Tests\Fixtures;
 
-use Laravel\Socialite\Two\AbstractProvider;
-use Laravel\Socialite\Two\User;
+use OnixSystemsPHP\HyperfSocialite\Two\AbstractProvider;
+use OnixSystemsPHP\HyperfSocialite\Two\User;
 use Mockery as m;
 use stdClass;
 
@@ -14,22 +14,22 @@ class OAuthTwoTestProviderStub extends AbstractProvider
      */
     public $http;
 
-    protected function getAuthUrl($state)
+    protected function getAuthUrl(string $state): string
     {
         return $this->buildAuthUrlFromBase('http://auth.url', $state);
     }
 
-    protected function getTokenUrl()
+    protected function getTokenUrl(): string
     {
         return 'http://token.url';
     }
 
-    protected function getUserByToken($token)
+    protected function getUserByToken(string $token): array
     {
         return ['id' => 'foo'];
     }
 
-    protected function mapUserToObject(array $user)
+    protected function mapUserToObject(array $user): User
     {
         return (new User)->map(['id' => $user['id']]);
     }
@@ -39,7 +39,7 @@ class OAuthTwoTestProviderStub extends AbstractProvider
      *
      * @return \GuzzleHttp\Client|\Mockery\MockInterface
      */
-    protected function getHttpClient()
+    protected function getHttpClient(): \GuzzleHttp\Client
     {
         if ($this->http) {
             return $this->http;

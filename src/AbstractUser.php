@@ -1,60 +1,60 @@
 <?php
 
-namespace Xtwoend\HySocialite;
+declare(strict_types=1);
+namespace OnixSystemsPHP\HyperfSocialite;
 
-use ArrayAccess;
-use Xtwoend\HySocialite\Contracts\User;
+use OnixSystemsPHP\HyperfSocialite\Contracts\User;
 
-abstract class AbstractUser implements ArrayAccess, User
+abstract class AbstractUser implements \ArrayAccess, User
 {
     /**
      * The unique identifier for the user.
      *
      * @var mixed
      */
-    public $id;
+    public string $id;
 
     /**
      * The user's nickname / username.
      *
-     * @var string
+     * @var string|null
      */
-    public $nickname;
+    public ?string $nickname;
 
     /**
      * The user's full name.
      *
-     * @var string
+     * @var string|null
      */
-    public $name;
+    public ?string $name;
 
     /**
      * The user's e-mail address.
      *
-     * @var string
+     * @var string|null
      */
-    public $email;
+    public ?string $email;
 
     /**
      * The user's avatar image URL.
      *
-     * @var string
+     * @var string|null
      */
-    public $avatar;
+    public ?string $avatar;
 
     /**
      * The user's raw attributes.
      *
      * @var array
      */
-    public $user;
+    public array $user;
 
     /**
      * Get the unique identifier for the user.
      *
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -64,9 +64,9 @@ abstract class AbstractUser implements ArrayAccess, User
      *
      * @return string
      */
-    public function getNickname()
+    public function getNickname(): string
     {
-        return $this->nickname;
+        return is_null($this->nickname) ? '' : $this->nickname;
     }
 
     /**
@@ -74,9 +74,9 @@ abstract class AbstractUser implements ArrayAccess, User
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
-        return $this->name;
+        return is_null($this->name) ? '' : $this->name;
     }
 
     /**
@@ -84,9 +84,9 @@ abstract class AbstractUser implements ArrayAccess, User
      *
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
-        return $this->email;
+        return is_null($this->email) ? '' : $this->email;
     }
 
     /**
@@ -94,9 +94,9 @@ abstract class AbstractUser implements ArrayAccess, User
      *
      * @return string
      */
-    public function getAvatar()
+    public function getAvatar(): string
     {
-        return $this->avatar;
+        return is_null($this->avatar) ? '' : $this->avatar;
     }
 
     /**
@@ -104,7 +104,7 @@ abstract class AbstractUser implements ArrayAccess, User
      *
      * @return array
      */
-    public function getRaw()
+    public function getRaw(): array
     {
         return $this->user;
     }
@@ -112,10 +112,9 @@ abstract class AbstractUser implements ArrayAccess, User
     /**
      * Set the raw user array from the provider.
      *
-     * @param  array  $user
      * @return $this
      */
-    public function setRaw(array $user)
+    public function setRaw(array $user): self
     {
         $this->user = $user;
 
@@ -125,10 +124,9 @@ abstract class AbstractUser implements ArrayAccess, User
     /**
      * Map the given array onto the user's properties.
      *
-     * @param  array  $attributes
      * @return $this
      */
-    public function map(array $attributes)
+    public function map(array $attributes): self
     {
         foreach ($attributes as $key => $value) {
             $this->{$key} = $value;
@@ -140,10 +138,10 @@ abstract class AbstractUser implements ArrayAccess, User
     /**
      * Determine if the given raw user attribute exists.
      *
-     * @param  string  $offset
+     * @param string $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return array_key_exists($offset, $this->user);
     }
@@ -151,10 +149,10 @@ abstract class AbstractUser implements ArrayAccess, User
     /**
      * Get the given key from the raw user.
      *
-     * @param  string  $offset
+     * @param string $offset
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->user[$offset];
     }
@@ -162,11 +160,10 @@ abstract class AbstractUser implements ArrayAccess, User
     /**
      * Set the given attribute on the raw user array.
      *
-     * @param  string  $offset
-     * @param  mixed  $value
-     * @return void
+     * @param string $offset
+     * @param mixed $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->user[$offset] = $value;
     }
@@ -174,10 +171,9 @@ abstract class AbstractUser implements ArrayAccess, User
     /**
      * Unset the given value from the raw user array.
      *
-     * @param  string  $offset
-     * @return void
+     * @param string $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->user[$offset]);
     }

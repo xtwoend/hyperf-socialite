@@ -1,6 +1,6 @@
 <?php
 
-namespace Xtwoend\HySocialite\Two;
+namespace OnixSystemsPHP\HyperfSocialite\Two;
 
 use Exception;
 use Hyperf\Utils\Arr;
@@ -12,19 +12,19 @@ class BitbucketProvider extends AbstractProvider implements ProviderInterface
      *
      * @var array
      */
-    protected $scopes = ['email'];
+    protected array $scopes = ['email'];
 
     /**
      * The separating character for the requested scopes.
      *
      * @var string
      */
-    protected $scopeSeparator = ' ';
+    protected string $scopeSeparator = ' ';
 
     /**
      * {@inheritdoc}
      */
-    protected function getAuthUrl($state)
+    protected function getAuthUrl(?string $state): string
     {
         return $this->buildAuthUrlFromBase('https://bitbucket.org/site/oauth2/authorize', $state);
     }
@@ -32,7 +32,7 @@ class BitbucketProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function getTokenUrl()
+    protected function getTokenUrl(): string
     {
         return 'https://bitbucket.org/site/oauth2/access_token';
     }
@@ -40,7 +40,7 @@ class BitbucketProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function getUserByToken($token)
+    protected function getUserByToken(string $token): array
     {
         $userUrl = 'https://api.bitbucket.org/2.0/user?access_token='.$token;
 
@@ -61,14 +61,14 @@ class BitbucketProvider extends AbstractProvider implements ProviderInterface
      * @param  string  $token
      * @return string|null
      */
-    protected function getEmailByToken($token)
+    protected function getEmailByToken(string $token): ?string
     {
         $emailsUrl = 'https://api.bitbucket.org/2.0/user/emails?access_token='.$token;
 
         try {
             $response = $this->getHttpClient()->get($emailsUrl);
         } catch (Exception $e) {
-            return;
+            return null;
         }
 
         $emails = json_decode($response->getBody(), true);
@@ -78,12 +78,13 @@ class BitbucketProvider extends AbstractProvider implements ProviderInterface
                 return $email['email'];
             }
         }
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function mapUserToObject(array $user)
+    protected function mapUserToObject(array $user): User
     {
         return (new User)->setRaw($user)->map([
             'id' => $user['uuid'],
@@ -100,7 +101,7 @@ class BitbucketProvider extends AbstractProvider implements ProviderInterface
      * @param  string  $code
      * @return string
      */
-    public function getAccessToken($code)
+    public function getAccessToken(string $code): string
     {
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'auth' => [$this->clientId, $this->clientSecret],

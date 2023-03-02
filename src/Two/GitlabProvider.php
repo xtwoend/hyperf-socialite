@@ -1,6 +1,6 @@
 <?php
 
-namespace Xtwoend\HySocialite\Two;
+namespace OnixSystemsPHP\HyperfSocialite\Two;
 
 class GitlabProvider extends AbstractProvider implements ProviderInterface
 {
@@ -9,21 +9,21 @@ class GitlabProvider extends AbstractProvider implements ProviderInterface
      *
      * @var array
      */
-    protected $scopes = ['read_user'];
+    protected array $scopes = ['read_user'];
 
     /**
      * The separating character for the requested scopes.
      *
      * @var string
      */
-    protected $scopeSeparator = ' ';
+    protected string $scopeSeparator = ' ';
 
     /**
      * The Gitlab instance host.
      *
      * @var string
      */
-    protected $host = 'https://gitlab.com';
+    protected string $host = 'https://gitlab.com';
 
     /**
      * Set the Gitlab instance host.
@@ -31,7 +31,7 @@ class GitlabProvider extends AbstractProvider implements ProviderInterface
      * @param  string|null  $host
      * @return $this
      */
-    public function setHost($host)
+    public function setHost(?string $host): self
     {
         if (! empty($host)) {
             $this->host = rtrim($host, '/');
@@ -43,7 +43,7 @@ class GitlabProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function getAuthUrl($state)
+    protected function getAuthUrl(?string $state): string
     {
         return $this->buildAuthUrlFromBase($this->host.'/oauth/authorize', $state);
     }
@@ -51,7 +51,7 @@ class GitlabProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function getTokenUrl()
+    protected function getTokenUrl(): string
     {
         return $this->host.'/oauth/token';
     }
@@ -59,7 +59,7 @@ class GitlabProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function getUserByToken($token)
+    protected function getUserByToken(string $token): array
     {
         $userUrl = $this->host.'/api/v3/user?access_token='.$token;
 
@@ -73,10 +73,10 @@ class GitlabProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function mapUserToObject(array $user)
+    protected function mapUserToObject(array $user): User
     {
         return (new User)->setRaw($user)->map([
-            'id' => $user['id'],
+            'id' => (string) $user['id'],
             'nickname' => $user['username'],
             'name' => $user['name'],
             'email' => $user['email'],

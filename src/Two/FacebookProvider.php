@@ -1,6 +1,6 @@
 <?php
 
-namespace Xtwoend\HySocialite\Two;
+namespace OnixSystemsPHP\HyperfSocialite\Two;
 
 use Hyperf\Utils\Arr;
 
@@ -11,54 +11,54 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
      *
      * @var string
      */
-    protected $graphUrl = 'https://graph.facebook.com';
+    protected string $graphUrl = 'https://graph.facebook.com';
 
     /**
      * The Graph API version for the request.
      *
      * @var string
      */
-    protected $version = 'v3.3';
+    protected string $version = 'v3.3';
 
     /**
      * The user fields being requested.
      *
      * @var array
      */
-    protected $fields = ['name', 'email', 'gender', 'verified', 'link'];
+    protected array $fields = ['name', 'email', 'gender', 'verified', 'link'];
 
     /**
      * The scopes being requested.
      *
      * @var array
      */
-    protected $scopes = ['email'];
+    protected array $scopes = ['email'];
 
     /**
      * Display the dialog in a popup view.
      *
      * @var bool
      */
-    protected $popup = false;
+    protected bool $popup = false;
 
     /**
      * Re-request a declined permission.
      *
      * @var bool
      */
-    protected $reRequest = false;
+    protected bool $reRequest = false;
 
     /**
      * The access token that was last used to retrieve a user.
      *
      * @var string|null
      */
-    protected $lastToken;
+    protected ?string $lastToken;
 
     /**
      * {@inheritdoc}
      */
-    protected function getAuthUrl($state)
+    protected function getAuthUrl(?string $state): string
     {
         return $this->buildAuthUrlFromBase('https://www.facebook.com/'.$this->version.'/dialog/oauth', $state);
     }
@@ -66,7 +66,7 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function getTokenUrl()
+    protected function getTokenUrl(): string
     {
         return $this->graphUrl.'/'.$this->version.'/oauth/access_token';
     }
@@ -74,7 +74,7 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getAccessTokenResponse($code)
+    public function getAccessTokenResponse(string $code): array
     {
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'form_params' => $this->getTokenFields($code),
@@ -88,7 +88,7 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function getUserByToken($token)
+    protected function getUserByToken(string $token): array
     {
         $this->lastToken = $token;
 
@@ -112,12 +112,12 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function mapUserToObject(array $user)
+    protected function mapUserToObject(array $user): User
     {
         $avatarUrl = $this->graphUrl.'/'.$this->version.'/'.$user['id'].'/picture';
 
         return (new User)->setRaw($user)->map([
-            'id' => $user['id'],
+            'id' => (string) $user['id'],
             'nickname' => null,
             'name' => $user['name'] ?? null,
             'email' => $user['email'] ?? null,
@@ -130,7 +130,7 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    protected function getCodeFields($state = null)
+    protected function getCodeFields(?string $state = null): array
     {
         $fields = parent::getCodeFields($state);
 
@@ -151,7 +151,7 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
      * @param  array  $fields
      * @return $this
      */
-    public function fields(array $fields)
+    public function fields(array $fields): self
     {
         $this->fields = $fields;
 
@@ -163,7 +163,7 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
      *
      * @return $this
      */
-    public function asPopup()
+    public function asPopup(): self
     {
         $this->popup = true;
 
@@ -175,7 +175,7 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
      *
      * @return $this
      */
-    public function reRequest()
+    public function reRequest(): self
     {
         $this->reRequest = true;
 
@@ -187,7 +187,7 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
      *
      * @return string|null
      */
-    public function lastToken()
+    public function lastToken(): ?string
     {
         return $this->lastToken;
     }
@@ -195,10 +195,10 @@ class FacebookProvider extends AbstractProvider implements ProviderInterface
     /**
      * Specify which graph version should be used.
      *
-     * @param  string  $version
+     * @param  string $version
      * @return $this
      */
-    public function usingGraphVersion(string $version)
+    public function usingGraphVersion(string $version): self
     {
         $this->version = $version;
 

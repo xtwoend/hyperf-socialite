@@ -4,7 +4,7 @@ namespace OnixSystemsPHP\HyperfSocialite\Two;
 
 use InvalidArgumentException;
 
-class InvalidStateException extends InvalidArgumentException
+class InvalidCodeException extends InvalidArgumentException
 {
     //
 }
